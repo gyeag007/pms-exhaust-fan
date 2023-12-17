@@ -111,7 +111,7 @@ struct pm_data {
 uint8_t wake[] = { 0x42, 0x4D, 0xE4, 0x00, 0x01, 0x01, 0x74 };
 uint8_t sleep[] = { 0x42, 0x4D, 0xE4, 0x00, 0x00, 0x01, 0x73 };
 
-//parsed.pm_2_5_env = 61 ;
+
 
 struct fan {
 	bool on = false;
@@ -276,12 +276,7 @@ void setup() {
   //Serial.println("waking up pms in setup...");
   //delay(30000);
 
- /*
-for (int pinNumber = 3; pinNumber < 7; pinNumber++) {
-    pinMode(pinNumber, OUTPUT);
-    digitalWrite(pinNumber, LOW);
-  }
-*/
+
   pinMode(relay, OUTPUT);      // Initialize the Atmel GPIO pin as an output
 
 	buff1[0] = '\0' ;
@@ -356,6 +351,7 @@ void recent_motion_func(struct fan& f, struct pir& p, struct mypms& m) {
     Serial.println("putting PMS to sleep  ");
     pms_serial.write(sleep, sizeof(sleep));
     m.awake = false;
+	  //set parsed.pm_2_5_env = 0;
     //delay(5000);
 		//f.on = false ;// 
     //digitalWrite(relay, LOW);
