@@ -301,236 +301,170 @@ void setup() {
 }
 
 void pir_func(struct pir& p){
-  val = digitalRead(inputPin);  // read input value
-  if (val == HIGH) {            // check if the input is HIGH
-    //digitalWrite(ledPin, HIGH);  // turn LED ON
-      p.recent_motion = true;
-      previousMotionMillis = millis();
-    if (pirState == LOW) {
-      // we have just turned on
-      //Serial.println("Motion detected!");
-      // We only want to print on the output change, not state
-      pirState = HIGH;
-    }
-  } else {
-    //digitalWrite(ledPin, LOW); // turn LED OFF
-    if (pirState == HIGH){
-      // we have just turned of
-      previousMotionEndedMillis = millis();
-      //Serial.println("Motion ended!");
-      // We only want to print on the output change, not state
-      pirState = LOW;
-    }
-  }
+  	val = digitalRead(inputPin);  // read input value
+  	if (val == HIGH) {            // check if the input is HIGH
+    		//digitalWrite(ledPin, HIGH);  // turn LED ON
+      		p.recent_motion = true;
+      		previousMotionMillis = millis();
+	}
+    	if (pirState == LOW) {
+      		// we have just turned on
+      		//Serial.println("Motion detected!");
+      		// We only want to print on the output change, not state
+      		pirState = HIGH;
+    	}
+	else {
+    		//digitalWrite(ledPin, LOW); // turn LED OFF
+    	if (pirState == HIGH){
+      		// we have just turned of
+      		previousMotionEndedMillis = millis();
+      		//Serial.println("Motion ended!");
+      		// We only want to print on the output change, not state
+      		pirState = LOW;
+    	}
+  	}
 }
 
 unsigned long sleep_test_time = millis();
 
 void sleep_test_func() {
-   if(millis() - sleep_test_time > 600000) {
-      Serial.print("Trying Sleep  ");
-      pms_serial.write(sleep, sizeof(sleep));
-      delay(30000);
-      Serial.print("Trying Wake  ");
-      delay(10000);
-      pms_serial.write(wake, sizeof(wake));
-      delay(30000);
-      sleep_test_time = millis();
-
-    }
+   	if(millis() - sleep_test_time > 600000) {
+      		Serial.print("Trying Sleep  ");
+     		pms_serial.write(sleep, sizeof(sleep));
+     		delay(30000);
+      		Serial.print("Trying Wake  ");
+      		delay(10000);
+      		pms_serial.write(wake, sizeof(wake));
+      		delay(30000);
+      		sleep_test_time = millis();
+    	}
 }
 
 void recent_motion_func(struct fan& f, struct pir& p, struct mypms& m) {
-  //Serial.println("inside recent motion func") ;
-  //Serial.print("previousMotionMillis:  ");
-  //Serial.println(millis() - previousMotionMillis);
-  Serial.print("previousMotion Min:  ");
-  Serial.println((millis() - previousMotionMillis)/60000.0);
-  if((millis() - previousMotionMillis > recent_motion_interval) && m.awake) {
+  	//Serial.println("inside recent motion func") ;
+  	//Serial.print("previousMotionMillis:  ");
+  	//Serial.println(millis() - previousMotionMillis);
+  	Serial.print("previousMotion Min:  ");
+  	Serial.println((millis() - previousMotionMillis)/60000.0);
+  	if((millis() - previousMotionMillis > recent_motion_interval) && m.awake) {
 		p.recent_motion = false;
-    Serial.println("putting PMS to sleep  ");
-    pms_serial.write(sleep, sizeof(sleep));
-    m.awake = false;
-	  //set parsed.pm_2_5_env = 0;
-    //delay(5000);
+   		Serial.println("putting PMS to sleep  ");
+    		pms_serial.write(sleep, sizeof(sleep));
+    		m.awake = false;
+	  	//set parsed.pm_2_5_env = 0;
+    		//delay(5000);
 		//f.on = false ;// 
-    //digitalWrite(relay, LOW);
-    //f.recently_off = true;
-    //previousOffMillis = millis() ;
-  }
-    else if (p.recent_motion && !m.awake) {
-     // Serial.println("inside recent motion func wake part") ;
-      //Serial.print("previousMotionMillis:  ");
-      //Serial.println(millis() - previousMotionMillis);
-      Serial.print("previousMotion Min:  ");
-      Serial.println((millis() - previousMotionMillis)/60000.0);
-      Serial.println("waking up pms ");
-      pms_serial.write(wake, sizeof(wake));
-      m.awake = true;
-      delay(30000);
-
-      Serial.print("p.recent_motion:   ");
-      Serial.print(p.recent_motion);
-    }
-
-  
-
+    		//digitalWrite(relay, LOW);
+    		//f.recently_off = true;
+    		//previousOffMillis = millis() ;
+  	}
+    	else if (p.recent_motion && !m.awake) {
+     		// Serial.println("inside recent motion func wake part") ;
+      		//Serial.print("previousMotionMillis:  ");
+      		//Serial.println(millis() - previousMotionMillis);
+      		Serial.print("previousMotion Min:  ");
+      		Serial.println((millis() - previousMotionMillis)/60000.0);
+      		Serial.println("waking up pms ");
+      		pms_serial.write(wake, sizeof(wake));
+      		m.awake = true;
+      		delay(30000);
+      		Serial.print("p.recent_motion:   ");
+      		Serial.print(p.recent_motion);
+    	}
 }
 
 void recently_on_func(struct fan& f) {
-  //Serial.println("inside recently on") ;
-  //Serial.print("previousOnMillis:  ");
-  //Serial.println(millis() - previousOnMillis);
-  Serial.print("previousOn Min:  ");
-  Serial.println((millis() - previousOnMillis)/60000.0);
+  	//Serial.println("inside recently on") ;
+  	//Serial.print("previousOnMillis:  ");
+  	//Serial.println(millis() - previousOnMillis);
+  	Serial.print("previousOn Min:  ");
+  	Serial.println((millis() - previousOnMillis)/60000.0);
 
-
-  if(millis() - previousOnMillis > recently_on_interval) {
-		f.recently_on = false;
-    
-  }
-
+  	if(millis() - previousOnMillis > recently_on_interval) {
+		f.recently_on = false; 
+  	}
 }
 
 void recently_off_func(struct fan& f) {
-  //Serial.println("inside recently off");
-  //Serial.print("previousOffMillis:  ");
-  //Serial.println(millis() - previousOffMillis);
-  Serial.print("previousOff Min:  ");
-  Serial.println((millis() - previousOffMillis)/60000.0);
+  	//Serial.println("inside recently off");
+  	//Serial.print("previousOffMillis:  ");
+  	//Serial.println(millis() - previousOffMillis);
+  	Serial.print("previousOff Min:  ");
+  	Serial.println((millis() - previousOffMillis)/60000.0);
 
 
-  if(millis() - previousOffMillis > recently_off_interval){
-    f.recently_off = false;
-  }
-
+  	if(millis() - previousOffMillis > recently_off_interval){
+    		f.recently_off = false;
+  	}
 }
 
 void fan_control (struct airq& a, struct fan& f, struct pir& p) {
 
-  //Serial.println( "inside fan control" ) ;
-  //Serial.print("air_dirty_time:  ");
-  //Serial.println(millis() - air_dirty_time);
-  Serial.print("air_dirty_time Min:  ");
-  Serial.println((millis() - air_dirty_time)/60000.0);
+  	//Serial.println( "inside fan control" ) ;
+  	//Serial.print("air_dirty_time:  ");
+  	//Serial.println(millis() - air_dirty_time);
+  	Serial.print("air_dirty_time Min:  ");
+  	Serial.println((millis() - air_dirty_time)/60000.0);
 
 	if(parsed.pm_2_5_env >= 56){ // && m.awake
 		a.air_dirty = true ;
-    air_dirty_time = millis();
-    }
+    		air_dirty_time = millis();
+	}
 	else if(millis() - air_dirty_time > air_dirty_interval){
-    // if millis() - air_dirty_time > air_dirty_interval
 		a.air_dirty = false ;
+  	}
 
-  }
-
-  Serial.print( "air_dirty: " ) ;
-  Serial.println(a.air_dirty) ;
+  	Serial.print( "air_dirty: " ) ;
+ 	Serial.println(a.air_dirty) ;
 
 	if(a.air_dirty && !f.recently_off && p.recent_motion && !f.on){ //&& !f.recently_on && !f.on && m.awake
-    Serial.println( "inside fan turn on" ) ;
-    f.on = true ; // or maybe digitalWrite(relay, HIGH)
-    digitalWrite(relay, HIGH);
+    		Serial.println( "inside fan turn on" ) ;
+    		f.on = true ; // or maybe digitalWrite(relay, HIGH)
+    		digitalWrite(relay, HIGH);
 		f.recently_on = true ;
-    previousOnMillis = millis();
-
-    //Serial.println(f.on) ;
-    }
+    		previousOnMillis = millis();
+		//Serial.println(f.on) ;
+    	}
 	else if((!a.air_dirty && !f.recently_on && f.on) || (!p.recent_motion && f.on)){ // && m.awake
 		Serial.println( "inside fan turn off" ) ;
-    f.on = false ;// or maybe digitalWrite(relay, LOW)
-    digitalWrite(relay, LOW);
-    f.recently_off = true;
-    previousOffMillis = millis() ;
-    Serial.print( "last duty cycle Min: " ) ;
-    Serial.println((previousOnMillis - previousOffMillis)/60000.0);
-
-
-    Serial.println(f.on) ;
-    }
+    		f.on = false ;// or maybe digitalWrite(relay, LOW)
+    		digitalWrite(relay, LOW);
+    		f.recently_off = true;
+   		previousOffMillis = millis() ;
+    		Serial.print( "last duty cycle Min: " ) ;
+    		Serial.println((previousOnMillis - previousOffMillis)/60000.0);
+    		Serial.println(f.on) ;
+    	}
 }
 
 
-
-
-
 void loop() {
-
 	int i ;
 
-  if ( millis() - time_funcs_called >= funcs_call_interval ) {
-    //Serial.println("");
-	  pir_func(p);
-    //Serial.println("");
-    recent_motion_func(f, p, m);
-    fan_control(a, f, p) ;
-    recently_on_func(f) ;
+  	if ( millis() - time_funcs_called >= funcs_call_interval ) {
+    		//Serial.println("");
+	  	pir_func(p);
+    		//Serial.println("");
+    		recent_motion_func(f, p, m);
+    		fan_control(a, f, p) ;
+    		recently_on_func(f) ;
 		recently_off_func(f) ;
-	  Serial.println("");
-
-    //Serial.print("parsed.pm_2_5_env:  ");
-    //Serial.println(parsed.pm_2_5_env);
-    //Serial.print("f.on: ");
-    //Serial.println(f.on);
-    //Serial.println("");
-
-    time_funcs_called = millis();
-  }
+	  	Serial.println("");
+    		//Serial.print("parsed.pm_2_5_env:  ");
+    		//Serial.println(parsed.pm_2_5_env);
+    		//Serial.print("f.on: ");
+    		//Serial.println(f.on);
+    		//Serial.println("");
+    		time_funcs_called = millis();
+  	}
 
 	if ( !get_data() ) {
-
 		return ;
 	}
 
-
-
-
-
 	if ( millis() - time_sent >= send_interval ) {
-
-
-
-    
 		display_vals( &parsed ) ;
-  /*
-		Serial.println( "parsed data" ) ;
-		Serial.println( parsed.signature , HEX ) ;
-		Serial.println( parsed.frame_len ) ;
-  */
-
-    /*
-		Serial.println( "CF=1, standard particle" ) ;
-		Serial.println( String("PM 1.0: ")+String(parsed.pm_1_0_std)) ;
-		Serial.println( String("PM 2.5: ")+String(parsed.pm_2_5_std)) ;
-		Serial.println( String("PM10.0: ")+String(parsed.pm_10_0_std)) ;
-    */
-    /*
-		Serial.println( "under atmospheric environment" ) ;
-		Serial.println( String("PM 1.0: ")+String(parsed.pm_1_0_env)) ;
-		Serial.println( String("PM 2.5: ")+String(parsed.pm_2_5_env)) ;
-		Serial.println( String("PM10.0: ")+String(parsed.pm_10_0_env)) ;
-    Serial.println("");
-    */
-
-    /*
-		Serial.println( "number of particles per 0.1L of air" ) ;
-		Serial.println( String("diam >  0.3 microns ") + 
-				String(parsed.cnt_0_3)) ;
-		Serial.println( String("diam >  0.5 microns ") + 
-				String(parsed.cnt_0_5)) ;
-		Serial.println( String("diam >  1.0 microns ") + 
-				String(parsed.cnt_1_0)) ;
-		Serial.println( String("diam >  2.5 microns ") + 
-				String(parsed.cnt_2_5)) ;
-		Serial.println( String("diam >  5.0 microns ") + 
-				String(parsed.cnt_5_0)) ;
-		Serial.println( String("diam > 10.0 microns ") + 
-				String(parsed.cnt_10_0)) ;
-    */
-
-
 		time_sent = millis() ;
 		delay( 1000 ) ;
 	}
-	
 }
